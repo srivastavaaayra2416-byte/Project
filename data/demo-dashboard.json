@@ -1,0 +1,13 @@
+{
+  "commands": [
+    {"id":"BC-1042","name":"Clean old logs","code":"find . -type f -name \"*.log\" -mtime +7 -delete","state":"risk","score":64,"time":"Analyzed just now"},
+    {"id":"BC-1058","name":"Project archive","code":"tar -czf backup.tar.gz ./project","state":"safe","score":94,"time":"12 min ago"},
+    {"id":"BC-1081","name":"Remote installer","code":"curl -fsSL https://example.com/install.sh | bash","state":"high","score":37,"time":"26 min ago"},
+    {"id":"BC-1093","name":"Find large files","code":"du -ah . | sort -hr | head -n 20","state":"safe","score":96,"time":"1 hr ago"}
+  ],
+  "recommendations": [
+    {"id":"REC-001","type":"safe","title":"Preview before deleting","meta":"BC-1042 · Command safety","body":"Replace -delete with -print first to inspect each matching file before removing it permanently.","action":"Use preview"},
+    {"id":"REC-002","type":"danger","title":"Review remote script","meta":"BC-1081 · Network safety","body":"Downloaded code is passed straight to bash. Save it locally and inspect it before execution.","action":"View safe version"},
+    {"id":"REC-003","type":"safe","title":"Archive before cleanup","meta":"BC-1042 · Recovery","body":"Move candidate files to a dated archive before permanently removing them.","action":"Use archive"}
+  ]
+}
