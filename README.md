@@ -1,41 +1,70 @@
 # BashCraft Analyzer
 
-PRD-aligned demo implementation of a safe website-crawl analyzer. It uses a seeded JSON demo database and simulated crawl events so the complete dashboard works without accessing the public internet.
+BashCraft is an interactive command-intelligence dashboard. Paste a shell command to see a plain-English explanation, identify risky patterns, review safer alternatives, and retain an analysis history for the current browser session.
 
-## Run
+## Highlights
+
+- Command overview with safety status, search, and risk filters
+- Command Lab for instant, client-side pattern analysis
+- Recommendations that can be approved or dismissed
+- Persistent analysis history and recommendation decisions via browser storage
+- Seeded demo dataset for commands and recommendations
+- Light/dark theme toggle and English/Hindi interface toggle
+- JSON report download
+- Responsive operations-dashboard UI
+
+## Quick start
+
+Requirements: Node.js 18 or later.
 
 ```powershell
 npm start -- 3000
 ```
 
-Open `http://localhost:3000`.
+Then open [http://localhost:3000](http://localhost:3000).
 
-## What works
+For syntax validation:
 
-- URL validation: HTTP/HTTPS only, no credentials, malformed URLs, local/private ranges, and common SSRF targets are rejected.
-- Crawl jobs: create, start, pause, resume, cancel, history, counters, live issue feed, page inspector, and graph view.
-- Results: page, issue, and sitemap report tabs; health score; JSON, CSV, and valid XML sitemap exports.
-- Demo database: stored in `data/bashcraft-demo-db.json`, created automatically and populated from a bounded fixture site.
-- UI: EN, HI, and ES runtime translations; persisted light/dark theme; responsive screens.
+```powershell
+npm run check
+```
 
-## REST API
+## Demo data
 
-All endpoints are prefixed with `/api/v1`.
+The dashboard loads its initial sample records from:
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| GET | `/health` | Service health |
-| POST | `/crawls` | Create a crawl with `url`, `maxPages`, `maxDepth`, and `speed` |
-| GET | `/crawls` | Crawl history |
-| GET | `/crawls/:id` | Crawl status, results, and counters |
-| POST | `/crawls/:id/start` | Start a queued crawl |
-| POST | `/crawls/:id/pause` | Pause a running crawl |
-| POST | `/crawls/:id/resume` | Resume a paused crawl |
-| POST | `/crawls/:id/cancel` | Cancel a crawl |
-| GET | `/crawls/:id/events` | Recorded crawl events |
-| GET | `/crawls/:id/pages` | Crawled pages |
-| GET | `/crawls/:id/links` | Link graph |
-| GET | `/crawls/:id/issues` | Crawl issues |
-| GET | `/crawls/:id/export?format=json|csv|xml` | Download an export |
+```text
+data/demo-dashboard.json
+```
 
-The demo crawler intentionally does not fetch arbitrary remote websites. Swap the fixture implementation in `backend.mjs` for a worker/queue-backed crawler after adding DNS pinning, robots handling, rate limits, and the remaining production safeguards from the PRD.
+The UI stores newly analyzed commands plus recommendation decisions in `localStorage`, so they remain available after refreshes in the same browser profile. Clear browser storage to reset the dashboard to its seed data.
+
+## Current analyzer behavior
+
+The command analyzer is intentionally static: it detects common patterns such as permanent deletion (`rm`, `-delete`) and remote script execution (`curl | bash`). It **does not execute commands** or access the filesystem.
+
+## Project structure
+
+```text
+app.js                  Dashboard interactions and local analysis rules
+index.html              App structure
+styles.css              Responsive dashboard styling
+data/demo-dashboard.json Seed commands and recommendations
+server.mjs              Local static server and API entry point
+backend.mjs             Backend prototype / API integration layer
+```
+
+## Backend integration
+
+The frontend is designed for a backend to replace the demo dataset and local browser storage. Useful integration points include:
+
+- Save analysis: `POST /api/analyses`
+- List/filter history: `GET /api/analyses`
+- Update recommendation decision: `PATCH /api/recommendations/:id`
+- Load dashboard metrics: `GET /api/dashboard`
+
+Keep the analyzer service non-executing: send commands for static inspection only, and never run submitted command text on the application server.
+
+## License
+
+Add the license appropriate for your project before production use.
